@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        .green-square {
+            width: 10px;
+            height: 10px;
+            background-color: green;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ player.name }}</h1>
+    <p>Points: {{ player.high_score }}</p>
+
+    <h2>Filter Tasks by Type</h2>
+    <form method="get" action="{% url 'home' %}">
+        <label for="task_types">Task Type:</label>
+        <select id="task_types" name="task_type">
+            <option value="">All</option>
+            {% for type in task_types %}
+                <option value="{{ type.name }}" {% if task_type == type.name %}selected{% endif %}>{{ type.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>All Tasks</h2>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <a href="{% url 'task_detail' task.id %}">{{ task.id }}</a>
+                {{ task.description }} | Max Score: {{ task.max_score }}
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Tasks in progress</h2>
+    <ul>
+        {% for history_task in history_tasks %}
+            <li>
+                {% if history_task.completed %}
+                    <div class="green-square"></div>
+                {% endif %}
+                {{ history_task.task }} Last Updated: {{ history_task.last_updated }}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

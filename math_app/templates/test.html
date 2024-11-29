@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Confirmation</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>JWT Confirmation</h1>
+    <script>
+        // Set the JWT token
+        const token = 'YOUR_JWT_TOKEN';
+
+        // Create an axios instance
+        const apiClient = axios.create({
+            baseURL: 'https://your-api-endpoint.com',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Example request to confirm JWT
+        apiClient.get('/your-api-path')
+            .then(response => console.log(response.data))
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

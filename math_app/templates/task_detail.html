@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Detail</title>
+</head>
+<body>
+    <h1>Task Detail</h1>
+    <p>{{ task.description }}</p>
+    <p>Max Score: {{ task.max_score }}</p>
+    <p>Difficulty: {{ task.difficulty }}</p>
+
+    {% if player_task.completed %}
+        <p>This task is already completed.</p>
+    {% else %}
+        <form method="post" action="{% url 'task_detail' task.id %}">
+            {% csrf_token %}
+            <label for="answer">Your Answer:</label>
+            <input type="text" id="answer" name="answer" required>
+            <button type="submit">Submit</button>
+        </form>
+    {% endif %}
+
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>

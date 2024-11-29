@@ -1,0 +1,63 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard </title>
+    <!-- Load Plotly from CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #plotly-chart {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard for {{ player_name }}</h1>
+        <div id="plotly-chart"></div>
+    </div>
+    <script>
+        var data = JSON.parse('{{ data|escapejs }}');
+
+        var xValues = data.map(item => item.task__type__name);
+        var yValues = data.map(item => item.count);
+
+        // Plot the data using Plotly
+        var plotData = [{
+            x: xValues,
+            y: yValues,
+            type: 'bar',
+            marker: {
+                color: 'rgba(55, 128, 191, 0.7)',
+                line: {
+                    color: 'rgba(55, 128, 191, 1.0)',
+                    width: 2
+                }
+            }
+        }];
+
+        var layout = {
+            title: 'Completed Tasks by Type',
+            xaxis: {
+                title: 'Task Type'
+            },
+            yaxis: {
+                title: 'Count'
+            }
+        };
+
+        Plotly.newPlot('plotly-chart', plotData, layout);
+    </script>
+</body>
+</html>
