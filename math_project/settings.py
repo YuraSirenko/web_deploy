@@ -95,9 +95,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'math_app',
-        'USER': 'root',
-        'PASSWORD': 'wireless',
-        'HOST': 'localhost',
+        'USER': 'yura',
+        'PASSWORD': '12345678',
+        'HOST': 'abcde-math-app.mysql.database.azure.com',
         'PORT': '3306',
     }
 }
