@@ -26,8 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Application definition
 
@@ -39,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework_simplejwt',
     'rest_framework',
-    'dpd_static_support',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'math_app',
     'dashboard',
