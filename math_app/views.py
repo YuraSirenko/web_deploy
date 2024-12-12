@@ -1,4 +1,5 @@
 from django.contrib.sites import requests
+from opencensus.trace import execution_context
 
 from math_project import settings
 from .repositories.models_repository import PlayerRepository, TaskRepository, TypeRepository
@@ -54,34 +55,36 @@ class PlayerTaskAPIView(APIView):
 
 class HomeAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    tracer = execution_context.get_opencensus_tracer()
+    with tracer.span(name='my_custom_span'):
+        def get(self, request):
+            user = request.user
+            player = PlayerService.get_player_by_user(user)
 
-    def get(self, request):
-        user = request.user
-        player = PlayerService.get_player_by_user(user)
+            task_type = request.GET.get('task_type')
 
-        task_type = request.GET.get('task_type')
+            if task_type:
+                tasks = TaskService.get_tasks_by_type(task_type)
+            else:
+                tasks = TaskRepository.get_all()
 
-        if task_type:
-            tasks = TaskService.get_tasks_by_type(task_type)
-        else:
-            tasks = TaskRepository.get_all()
+            history_tasks = PlayerTaskService.get_player_task_history(player)
+            task_types = TypeRepository.get_all()
 
-        history_tasks = PlayerTaskService.get_player_task_history(player)
-        task_types = TypeRepository.get_all()
+            player_data = PlayerSerializer(player).data
+            tasks_data = TaskSerializer(tasks, many=True).data
+            completed_tasks_data = PlayerTaskSerializer(history_tasks, many=True).data
 
-        player_data = PlayerSerializer(player).data
-        tasks_data = TaskSerializer(tasks, many=True).data
-        completed_tasks_data = PlayerTaskSerializer(history_tasks, many=True).data
+            context = {
+                'player': player_data,
+                'tasks': tasks_data,
+                'history_tasks': completed_tasks_data,
+                'task_type': task_type,
+                'task_types': task_types,
+            }
 
-        context = {
-            'player': player_data,
-            'tasks': tasks_data,
-            'history_tasks': completed_tasks_data,
-            'task_type': task_type,
-            'task_types': task_types,
-        }
+            return render(request, 'home.html', context)
 
-        return render(request, 'home.html', context)
 
 class TaskDetailView(APIView):
     permission_classes = [IsAuthenticated]

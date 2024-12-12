@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+from opencensus.ext.azure.trace_exporter import AzureExporter
+from opencensus.trace.tracer import Tracer
+from opencensus.trace.samplers import AlwaysOnSampler
+import logging
+from opencensus.ext.azure.trace_exporter import AzureExporter
+from opencensus.trace.samplers import AlwaysOnSampler
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +31,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-k1#253+m^lt7-5dk4_x%&nx9&y6ym(t_t%2nezkm-*jheu17+t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+from azure.monitor.opentelemetry import configure_azure_monitor
+
+configure_azure_monitor(
+    connection_string="InstrumentationKey=c8594e9b-34ef-4830-ba2a-7257d7ade19c;IngestionEndpoint=https://southafricanorth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southafricanorth.livediagnostics.monitor.azure.com/;ApplicationId=9670ba84-e48a-407f-8f09-c0c44e9c6202",
+    enable_live_metrics=True
+)
+
+
+# Application Insights Instrumentation Key
+INSTRUMENTATION_KEY = 'c8594e9b-34ef-4830-ba2a-7257d7ade19c'
+# Set up the trace exporter for Application Insights
+exporter = AzureExporter(connection_string=f'InstrumentationKey={INSTRUMENTATION_KEY}')
+sampler = AlwaysOnSampler()
+
+# Initialize the tracer with the Azure exporter and AlwaysOnSampler
+TRACER = Tracer(sampler=sampler, exporter=exporter)
+
+# Log setup for Application Insights (optional but recommended)
+logger = logging.getLogger(__name__)
+logger.addHandler(AzureLogHandler(connection_string=f'InstrumentationKey={INSTRUMENTATION_KEY}'))
 
 ALLOWED_HOSTS = ['*']
 
@@ -53,6 +82,7 @@ REST_FRAMEWORK = {
     ],
 }
 MIDDLEWARE = [
+    'opencensus.ext.django.middleware.OpencensusMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
